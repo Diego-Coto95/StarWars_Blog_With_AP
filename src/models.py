@@ -36,10 +36,33 @@ class Favorites(db.Model):
         }
 
 #######################################################################
+#People
+class People(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), unique=False, nullable=False)
+    birth = db.Column(db.String(250), unique=False, nullable=False)
+    gender = db.Column(db.String(250), unique=False, nullable=False)
+    height = db.Column(db.Float, unique=False, nullable=False)
+    skin = db.Column(db.String(250), unique=False, nullable=False)
+    eye_color = db.Column(db.String(250), unique=False, nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "birth": self.birth,
+            "gender": self.gender,
+            "height": self.height,
+            "skin": self.skin,
+            "eye_color": self.eye_color,
+            # do not serialize the password, its a security breach
+        }
+
+#######################################################################
 #Planets
 class Planets(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), unique=False, nullable=False)
+    name = db.Column(db.String(250), unique=True, nullable=False)
     climate = db.Column(db.String(250), unique=False, nullable=False)
     population = db.Column(db.Integer, unique=True, nullable=False)
     orbital = db.Column(db.Integer, unique=True, nullable=False)
@@ -57,28 +80,5 @@ class Planets(db.Model):
             "period": self.period,
             "rotation_period": self.rotation_period,
             "diameter": self.diameter,
-            # do not serialize the password, its a security breach
-        }
-
-#######################################################################
-#People
-class People(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), unique=False, nullable=False)
-    birth = db.Column(db.String, unique=False, nullable=False)
-    gender = db.Column(db.String(250), unique=False, nullable=False)
-    height = db.Column(db.Float, unique=False, nullable=False)
-    skin = db.Column(db.String(250), unique=False, nullable=False)
-    eye_color = db.Column(db.String(250), unique=False, nullable=False)
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "birth": self.birth,
-            "gender": self.gender,
-            "height": self.height,
-            "skin": self.skin,
-            "eye_color": self.eye_color,
             # do not serialize the password, its a security breach
         }

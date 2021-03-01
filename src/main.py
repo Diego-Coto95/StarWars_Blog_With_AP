@@ -8,9 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Favorites, Planets, People
-#from random import randint
-#from models import Person
+from models import db, User, Favorites, People, Planets
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -44,7 +42,7 @@ def get_users():
 @app.route('/user', methods=['POST'])
 def add_user():
     request_body = json.loads(request.data) #Peticion de los datos, que se cargaran en formato json  // json.loads transcribe a lenguaje de python UTF-8
-    if request_body["name"] == None and request_body["email"] == None and request_body["password"] == None and request_body["is_active"] == None:
+    if request_body["name"] == None and request_body["email"] == None:
         return "Datos incompletos, favor completar todos los datos!"
     else:
         user = User(name= request_body["name"], email= request_body["email"], password= request_body["password"], is_active= request_body["is_active"])
@@ -61,12 +59,49 @@ def del_user_by_id(id):
 
 ############# Favorites #################
 
+############# People ################
+#Esta funcion extrae todos los people
+@app.route('/people', methods=['GET'])
+def get_people():
+    people_query = People.query.all()
+    result = list(map(lambda x: x.serialize(), people_query)) #Mapea y obtiene lo que necesito //Lista los datos que tiene la tabla serializada
+    return jsonify(result), 200 
+
+@app.route('/people/<int:id>', methods=['GET'])
+def get_people_by_id(id):
+    people = People.query.filter_by(id=id).first_or_404()
+    return jsonify(people.serialize()), 200
+
+@app.route('/people', methods=['POST'])
+def add_people():
+    request_body = json.loads(request.data) #Peticion de los datos, que se cargaran en formato json  // json.loads transcribe a lenguaje de python UTF-8
+    if request_body["name"] == None and request_body["birth"] == None and request_body["gender"] == None and request_body["height"] == None  and request_body["skin"] == None and request_body["eye_color"] == None:
+        return "Datos incompletos, favor completar todos los datos!"
+    else:
+        person = People(name= request_body["name"],birth= str(request_body["birth"]),gender= request_body["gender"],height= request_body["height"],skin= request_body["skin"],eye_color= request_body["eye_color"]) 
+        db.session.add(person)
+        db.session.commit()
+        return "Posteo Exitoso" 
+
+@app.route('/people/<int:id>', methods=['DELETE'])
+def del_people_by_id(id):
+    people = People.query.filter_by(id=id).first_or_404()
+    db.session.delete(people)
+    db.session.commit()
+    return("User has been deleted successfully"), 200
+
+
 ############# Planets ###############
 @app.route('/planets', methods=['GET'])
 def get_planets():
     planets_query = Planets.query.all()
     result = list(map(lambda x: x.serialize(), planets_query)) #Mapea y obtiene lo que necesito //Lista los datos que tiene la tabla serializada
     return jsonify(result), 200 
+
+@app.route('/planets/<int:id>', methods=['GET'])
+def get_planet_by_id(id):
+    planet = Planets.query.filter_by(id=id).first_or_404()
+    return jsonify(planet.serialize()), 200
 
 @app.route('/planets', methods=['POST'])
 def add_planet():
@@ -86,51 +121,7 @@ def del_planet_by_id(id):
     db.session.commit()
     return("User has been deleted successfully"), 200
 
-############# People ################
-#Esta funcion extrae todos los people
-@app.route('/people', methods=['GET'])
-def get_people():
-    people_query = People.query.all()
-    result = list(map(lambda x: x.serialize(), people_query)) #Mapea y obtiene lo que necesito //Lista los datos que tiene la tabla serializada
-    return jsonify(result), 200 
 
-@app.route('/people', methods=['POST'])
-def add_people():
-    request_body = json.loads(request.data) #Peticion de los datos, que se cargaran en formato json  // json.loads transcribe a lenguaje de python UTF-8
-    if request_body["name"] == None and request_body["birth"] == None and request_body["gender"] == None and request_body["height"] == None  and request_body["skin"] == None and request_body["eye_color"] == None:
-        return "Datos incompletos, favor completar todos los datos!"
-    else:
-        person = People(name= request_body["name"],birth= str(request_body["birth"]),gender= request_body["gender"],height= request_body["height"],skin= request_body["skin"],eye_color= request_body["eye_color"]) 
-        db.session.add(person)
-        db.session.commit()
-        return "Posteo Exitoso" 
-
-@app.route('/people/<int:id>', methods=['DELETE'])
-def del_people_by_id(id):
-    people = People.query.filter_by(characters_id=id).first_or_404()
-    db.session.delete(people)
-    db.session.commit()
-    return("User has been deleted successfully"), 200
-
-
-# @app.route('/person/<int:id>', methods=['GET'])
-# def get_one_person(id):
-#     # fill this method and update the return
-#     person = People.query.get(id)
-#     return jsonify(person) , 200
-
-# @app.route('/person', methods=['POST'])
-# def add_new_person():
-#     # fill this method and update the return
-#     request_body = json.loads(request.data)
-#     personas.add_person(request_body)
-#     return jsonify(request_body)
-
-# @app.route('/person/<int:id>', methods=['DELETE'])
-# def delete_one_person(id):
-#     # fill this method and update the return
-#     personas.delete_person(id)
-#     return jsonify({"done":True}) , 200
 
 
 # this only runs if `$ python src/main.py` is executed
