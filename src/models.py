@@ -1,13 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean, Date
-from random import randint
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean
 
 db = SQLAlchemy()
 ##############################################################################
 #Users
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=False, nullable=False)
+    name = db.Column(db.String(110), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
@@ -31,7 +30,7 @@ class Favorites(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.email,
+            "name": self.name,
             "Type": self.Type,
             # do not serialize the password, its a security breach
         }
@@ -39,7 +38,7 @@ class Favorites(db.Model):
 #######################################################################
 #Planets
 class Planets(db.Model):
-    planets_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), unique=False, nullable=False)
     climate = db.Column(db.String(250), unique=False, nullable=False)
     population = db.Column(db.Integer, unique=True, nullable=False)
@@ -50,7 +49,7 @@ class Planets(db.Model):
 
     def serialize(self):
         return {
-            "planets_id": self.planets_id,
+            "id": self.id,
             "name": self.name,
             "climate": self.climate,
             "population": self.population,
@@ -64,7 +63,7 @@ class Planets(db.Model):
 #######################################################################
 #People
 class People(db.Model):
-    characters_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), unique=False, nullable=False)
     birth = db.Column(db.String, unique=False, nullable=False)
     gender = db.Column(db.String(250), unique=False, nullable=False)
@@ -74,7 +73,7 @@ class People(db.Model):
 
     def serialize(self):
         return {
-            "characters_id": self.characters_id,
+            "id": self.id,
             "name": self.name,
             "birth": self.birth,
             "gender": self.gender,

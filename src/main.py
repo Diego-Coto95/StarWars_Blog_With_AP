@@ -44,10 +44,10 @@ def get_users():
 @app.route('/user', methods=['POST'])
 def add_user():
     request_body = json.loads(request.data) #Peticion de los datos, que se cargaran en formato json  // json.loads transcribe a lenguaje de python UTF-8
-    if request_body["name"] == None and request_body["email"] == None:
+    if request_body["name"] == None and request_body["email"] == None and request_body["password"] == None and request_body["is_active"] == None:
         return "Datos incompletos, favor completar todos los datos!"
     else:
-        user = User(name= request_body["name"], email= request_body["email"])
+        user = User(name= request_body["name"], email= request_body["email"], password= request_body["password"], is_active= request_body["is_active"])
         db.session.add(user)
         db.session.commit()
         return "Posteo Exitoso"
@@ -79,6 +79,13 @@ def add_planet():
         db.session.commit()
         return "Posteo Exitoso" 
 
+@app.route('/planets/<int:id>', methods=['DELETE'])
+def del_planet_by_id(id):
+    planet = Planets.query.filter_by(id=id).first_or_404()
+    db.session.delete(planet)
+    db.session.commit()
+    return("User has been deleted successfully"), 200
+
 ############# People ################
 #Esta funcion extrae todos los people
 @app.route('/people', methods=['GET'])
@@ -96,9 +103,14 @@ def add_people():
         person = People(name= request_body["name"],birth= str(request_body["birth"]),gender= request_body["gender"],height= request_body["height"],skin= request_body["skin"],eye_color= request_body["eye_color"]) 
         db.session.add(person)
         db.session.commit()
-        #return jsonify(people_query), 200 
         return "Posteo Exitoso" 
 
+@app.route('/people/<int:id>', methods=['DELETE'])
+def del_people_by_id(id):
+    people = People.query.filter_by(characters_id=id).first_or_404()
+    db.session.delete(people)
+    db.session.commit()
+    return("User has been deleted successfully"), 200
 
 
 # @app.route('/person/<int:id>', methods=['GET'])
