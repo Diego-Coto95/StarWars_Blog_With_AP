@@ -10,6 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    #favorites = db.relationship('Favorites',lazy=True)
     
     def serialize(self):
         return {
@@ -45,16 +46,18 @@ class People(db.Model):
     height = db.Column(db.Float, unique=False, nullable=False)
     skin = db.Column(db.String(250), unique=False, nullable=False)
     eye_color = db.Column(db.String(250), unique=False, nullable=False)
+    hair_color = db.Column(db.String(250), unique=False, nullable=False)
 
     def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
-            "birth": self.birth,
+            "birth_year": self.birth,
             "gender": self.gender,
             "height": self.height,
-            "skin": self.skin,
+            "skin_color": self.skin,
             "eye_color": self.eye_color,
+            "hair_color": self.hair_color,
             # do not serialize the password, its a security breach
         }
 
@@ -69,6 +72,8 @@ class Planets(db.Model):
     period = db.Column(db.Integer, unique=True,  nullable=False)
     rotation_period = db.Column(db.Integer, unique=False,  nullable=False)
     diameter = db.Column(db.Integer, unique=True,  nullable=False)
+    terrain = db.Column(db.String(250), unique=True,  nullable=False)
+    gravity = db.Column(db.Float, unique=True,  nullable=False)
 
     def serialize(self):
         return {
@@ -76,9 +81,12 @@ class Planets(db.Model):
             "name": self.name,
             "climate": self.climate,
             "population": self.population,
-            "orbital": self.orbital,
+            "orbital_period": self.orbital,
             "period": self.period,
             "rotation_period": self.rotation_period,
             "diameter": self.diameter,
+            "terrain": self.terrain,
+            "gravity": self.gravity,
+
             # do not serialize the password, its a security breach
         }
