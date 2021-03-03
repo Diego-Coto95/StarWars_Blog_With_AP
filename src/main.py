@@ -15,8 +15,7 @@ import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 ## Nos permite manejar tokens por authentication (usuarios) 
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity # se instala con pipenv install Flask-JWT-Extended
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -44,8 +43,8 @@ def sitemap():
 #################################################### Users #########################################################
 @app.route('/user', methods=['GET'])
 def get_users():
-    users_query = User.query.all() #Query es una consulta
-    result = list(map(lambda x: x.serialize(), users_query)) #Mapea y obtiene lo que necesito //Lista los datos que tiene la tabla serializada
+    users_query = User.query.all() #Query es una consulta # get all the favorites
+    result = list(map(lambda x: x.serialize(), users_query)) # map the results and your list of people  inside of the all_people variable
     return jsonify(result), 200 
 
 @app.route('/user/<int:id>', methods=['GET'])
@@ -56,10 +55,10 @@ def get_user_by_id(id):
 @app.route('/user', methods=['POST'])
 def add_user():
     request_body = json.loads(request.data) #Peticion de los datos, que se cargaran en formato json  // json.loads transcribe a lenguaje de python UTF-8
-    if request_body["name"] == None and request_body["email"] == None:
+    if request_body["email"] == None:
         return "Datos incompletos, favor completar todos los datos!"
     else:
-        user = User(name= request_body["name"], email= request_body["email"], password= request_body["password"], is_active= request_body["is_active"])
+        user = User(email= request_body["email"], password= request_body["password"])
         db.session.add(user)
         db.session.commit()
         return "Posteo Exitoso"
@@ -84,7 +83,7 @@ def add_fav():
     # recibir info del request
     request_body = request.get_json()
     print(request_body)
-    fav = Favorites(name=request_body["name"], uid=request_body['uid'])
+    fav = Favorites(name=request_body["name"], user_id=request_body['user_id'])
     db.session.add(fav)
     db.session.commit()
     return jsonify("All good"), 200
@@ -186,6 +185,7 @@ def register():
         email = request.json.get("email", None)
         password = request.json.get("password", None)
 
+        #Valida que se ingrese un nuevo email y contraseña
         if not email:
             return jsonify({"msg": "email is required"}), 400
         if not password:
@@ -195,17 +195,17 @@ def register():
         if user:
             return jsonify({"msg": "Username  already exists"}), 400
 
-        user = User()
-        user.email = email
-        hashed_password = generate_password_hash(password)
+        user = User() # Crea un nuevo usuario 
+        user.email = email # email que ingresa el usuario
+        hashed_password = generate_password_hash(password) #Incripcion de la contraseña
         print(password, hashed_password)
-        user.password = hashed_password
-        db.session.add(user)
+        user.password = hashed_password # se le asigna al usuario el password que se acaba de generar
+        db.session.add(user) # agrga al usuario a la DB
         db.session.commit()
 
         return jsonify({"success": "Thanks. your register was successfully", "status": "true"}), 200
 
-############################################## LOGIN ######################################################
+# ############################################## LOGIN ######################################################
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -213,11 +213,13 @@ def login():
         email = request.json.get("email", None)
         password = request.json.get("password", None)
 
+        #Se chequea que el email y el pass existan
         if not email:
             return jsonify({"msg": "Username is required"}), 400
         if not password:
             return jsonify({"msg": "Password is required"}), 400
 
+        #Se chequea que el usuario exista
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify({"msg": "Username/Password are incorrect"}), 401
@@ -239,12 +241,12 @@ def login():
 
 ################################### PROFILE ####################################################
 
-@app.route('/profile', methods=['GET'])
-@jwt_required()
-def profile():
-    if request.method == 'GET':
-        token = get_jwt_identity()
-        return jsonify({"success": "Acceso a espacio privado", "usuario": token}), 200
+# @app.route('/profile', methods=['GET'])
+# @jwt_required()
+# def profile():
+#     if request.method == 'GET':
+#         token = get_jwt_identity()
+#         return jsonify({"success": "Acceso a espacio privado", "usuario": token}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

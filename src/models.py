@@ -5,34 +5,35 @@ db = SQLAlchemy()
 ##############################################################################
 #Users
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(110), unique=False, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
-    #favorites = db.relationship('Favorites',lazy=True)
+    email = db.Column(db.String(120), unique=True)
+    password = db.Column(db.String(250), unique=False, nullable=False)
+    favs = db.relationship("Favorites", lazy=True)
+    
+    def __repr__(self):
+        return '<User %r>' % self.username
     
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
             "email": self.email,
             # do not serialize the password, its a security breach
         }
-
 #########################################################################
 #Favorites
 class Favorites(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), unique=False, nullable=False)
-    Type = db.Column(db.Boolean, unique=False, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    name = db.Column(db.String(250), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+
+    def __repr__(self):
+        return '<User %r>' % self.username
 
     def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
-            "Type": self.Type,
             # do not serialize the password, its a security breach
         }
 
