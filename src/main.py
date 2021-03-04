@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for, json
+from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
@@ -17,6 +17,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 ## Nos permite manejar tokens por authentication (usuarios) 
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity # se instala con pipenv install Flask-JWT-Extended
 
+# SETUP del app
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
@@ -26,8 +27,6 @@ db.init_app(app)
 CORS(app)
 setup_admin(app)
 jwt = JWTManager(app)
-
-# read-only: Use this method to generate random members ID's when adding members into the list
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -111,8 +110,6 @@ def del_fav(fid):
     db.session.delete(fav)
     db.session.commit()
     return jsonify("All good"), 200
-
-
 
 #################################################### People ###########################################################
 #Esta funcion extrae todos los people
@@ -241,12 +238,12 @@ def login():
 
 ################################### PROFILE ####################################################
 
-# @app.route('/profile', methods=['GET'])
-# @jwt_required()
-# def profile():
-#     if request.method == 'GET':
-#         token = get_jwt_identity()
-#         return jsonify({"success": "Acceso a espacio privado", "usuario": token}), 200
+@app.route('/profile', methods=['GET'])
+@jwt_required()# token que se ha enviado
+def profile():
+    if request.method == 'GET':
+        token = get_jwt_identity()# Revisa con repecto al token que se le ha enviado
+        return jsonify({"success": "Acceso a espacio privado", "usuario": token}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
